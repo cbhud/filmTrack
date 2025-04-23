@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
+@Entity
 @Data
 public class Movie {
     @Id
@@ -14,6 +15,9 @@ public class Movie {
     private String genre;
     private String director;
     private Integer releaseYear;
+    @OneToMany
     private List<Review> reviews;
+    @ManyToMany
+
     private List<Profile> users;
 }

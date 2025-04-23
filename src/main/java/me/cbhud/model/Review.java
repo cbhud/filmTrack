@@ -21,7 +21,7 @@ public class Review {
     @ManyToOne
     @JsonIgnore
     private Profile profile;
-//    @ManyToOne
-//    private Movie movie;
+    @ManyToOne
+    private Movie movie;
 
 }
