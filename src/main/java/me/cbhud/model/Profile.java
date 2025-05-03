@@ -2,11 +2,8 @@ package me.cbhud.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Data
@@ -27,8 +24,8 @@ public class Profile {
     @JoinColumn(name = "profile_id")
     private List<Review> reviews;
 
-    @ManyToMany
-    private Set<Movie> watchedMovies;
+    //MANYTOMANY
+//    private Set<Movie> watchedMovies;
 
 
 

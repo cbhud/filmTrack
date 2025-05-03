@@ -10,18 +10,19 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @RegisterRestClient(configKey = "time-api")
 public interface TimeClient {
 
-
     @GET
     @Path("/zone")
     TimeResponse getTime(@QueryParam("timeZone") String timeZone);
 
+
     @GET
     @Path("/coordinate")
-    TimeResponse getCoordinate(@QueryParam("latitude") String latitude, @QueryParam("longitude") String longitude);
+    TimeResponse getCoordinate(@QueryParam("longtitude") String longtitude, @QueryParam("latitude") String latitude);
 
     @GET
     @Path("/ip")
     TimeResponse getIp(@QueryParam("ipAddress") String ipAddress);
+
 
 
 }

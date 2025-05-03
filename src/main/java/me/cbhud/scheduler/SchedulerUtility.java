@@ -10,19 +10,14 @@ public class SchedulerUtility {
     @RestClient
     TimeClient timeClient;
     //@Scheduled(every ="1s")
-//    void increment(){
-//        TimeResponse time = timeClient.getTime("Europe/Amsterdam");
-//        System.out.println(time);
-//    }
-
-//
-//    public void getTimeByIp(){
-//    }
-
-    @Scheduled(every="1s")
-    void getTime() {
+    void increment(){
         TimeResponse time = timeClient.getTime("Europe/Amsterdam");
         System.out.println(time);
     }
 
+    public void getTimeByIp(){
+
+
+
+    }
 }
