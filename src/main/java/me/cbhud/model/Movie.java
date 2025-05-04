@@ -3,8 +3,7 @@ package me.cbhud.model;
 import lombok.Data;
 import jakarta.persistence.*;
 
-import java.util.List;
-
+@Entity
 @Data
 public class Movie {
     @Id
@@ -14,6 +13,8 @@ public class Movie {
     private String genre;
     private String director;
     private Integer releaseYear;
-    private List<Review> reviews;
-    private List<Profile> users;
+//    @OneToMany
+//    private List<Review> reviews;
+
+
 }
