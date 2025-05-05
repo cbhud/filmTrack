@@ -18,8 +18,11 @@ public class Profile {
     private String email;
     private String fullName;
     private String username;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
     @JoinColumn(name = "profile_id")
+
     private List<Review> reviews;
 
 //    @ManyToMany

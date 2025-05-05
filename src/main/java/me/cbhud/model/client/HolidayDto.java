@@ -2,17 +2,15 @@ package me.cbhud.model.client;
 
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Data
 public class HolidayDto {
-    public LocalDate date;
-    public String localName;
-    public String name;
-    public String countryCode;
-    public boolean global;
-    public List<String> counties;
-    public Integer launchYear;
-    public List<String> types;
+    private String localName;
+    private String name;
+    private String countryCode;
+    private boolean global;
+    private List<String> counties;
+    private int launchYear;
+    private List<String> types;
 }

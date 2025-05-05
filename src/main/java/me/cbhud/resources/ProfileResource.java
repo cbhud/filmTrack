@@ -17,7 +17,7 @@ public class ProfileResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("create")
-    public Response createStudent(Profile profile) {
+    public Response createProfile(Profile profile) {
         Profile p = profileRepository.createProfile(profile);
         return Response.ok().entity(p).build();
     }
@@ -25,7 +25,7 @@ public class ProfileResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("getAll")
-    public Response getProfileAllProfiles() {
+    public Response getAllProfiles() {
         List<Profile> p = profileRepository.getAllProfiles();
         return Response.ok().entity(p).build();
     }
