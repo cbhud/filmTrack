@@ -1,6 +1,7 @@
 package me.cbhud.model;
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.util.List;
 
 @Entity
@@ -20,10 +21,9 @@ public class Profile {
     private String username;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-
     @JoinColumn(name = "profile_id")
-
     private List<Review> reviews;
+
 
 //    @ManyToMany
 //    private Set<Movie> watchedMovies;

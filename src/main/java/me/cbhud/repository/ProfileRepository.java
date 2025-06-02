@@ -7,6 +7,7 @@ import me.cbhud.exception.ProfileException;
 import me.cbhud.model.Profile;
 import me.cbhud.model.ProfileMovie;
 import me.cbhud.model.Review;
+
 import java.util.List;
 
 @Dependent
@@ -30,6 +31,7 @@ public class ProfileRepository {
         }
         return profiles;
     }
+
 
     @Transactional
     public List<Profile> getProfileByUsername(String username) throws ProfileException {

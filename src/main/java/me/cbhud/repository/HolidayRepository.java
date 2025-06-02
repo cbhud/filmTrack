@@ -1,6 +1,7 @@
 package me.cbhud.repository;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -11,7 +12,7 @@ import me.cbhud.model.client.HolidayType;
 import java.util.ArrayList;
 import java.util.List;
 
-@ApplicationScoped
+@Dependent
 public class HolidayRepository {
 
     @Inject

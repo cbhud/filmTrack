@@ -7,20 +7,14 @@ import me.cbhud.exception.ProfileException;
 import me.cbhud.model.Profile;
 import me.cbhud.model.ProfileMovie;
 import me.cbhud.repository.ProfileRepository;
+
+
 import java.util.List;
 
 @Path("/profile/")
 public class ProfileResource {
     @Inject
     private ProfileRepository profileRepository;
-
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("create")
-    public Response createProfile(Profile profile) {
-        Profile p = profileRepository.createProfile(profile);
-        return Response.ok().entity(p).build();
-    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -40,6 +34,14 @@ public class ProfileResource {
         } catch (ProfileException e) {
             return Response.ok().entity(e.getMessage()).build();
         }
+        return Response.ok().entity(p).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("create")
+    public Response createProfile(Profile profile) {
+        Profile p = profileRepository.createProfile(profile);
         return Response.ok().entity(p).build();
     }
 
