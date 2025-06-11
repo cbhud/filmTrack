@@ -45,6 +45,20 @@ public class ProfileResource {
         return Response.ok().entity(p).build();
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("get")
+    public Response getProfileById(@QueryParam("id") int id) {
+        Profile p;
+        try {
+            p = profileRepository.getProfileById(id);
+            File slika = new File(p.getFilePath());
+        } catch (ProfileException e) {
+            return Response.ok().entity(e.getMessage()).build();
+        }
+        return Response.ok().entity(p).build();
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("create")
