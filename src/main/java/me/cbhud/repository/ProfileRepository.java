@@ -49,6 +49,19 @@ public class ProfileRepository {
     }
 
     @Transactional
+    public Profile getProfileById(int id) throws ProfileException {
+        Profile profile = em.createNamedQuery(Profile.GET_PROFILE_BY_ID, Profile.class)
+                .setParameter("id", id).getSingleResult();
+        if (profile == null) {
+            throw new ProfileException("No profile found with id: " + id);
+        }
+            List<Review> reviews = em.createNamedQuery(Review.GET_ALL_REVIEWS_PROFILE, Review.class)
+                    .setParameter("id", id).getResultList();
+            profile.setReviews(reviews);
+        return profile;
+    }
+
+    @Transactional
     public ProfileMovie createProfileMovie(ProfileMovie p){
         return em.merge(p);
     }
