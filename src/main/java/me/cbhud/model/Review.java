@@ -8,11 +8,12 @@ import java.util.Date;
 @Data
 
 @NamedQuery(name = Review.GET_ALL_REVIEWS_PROFILE, query = "SELECT r from Review r where r.profile.id = :id")
+@NamedQuery(name = Review.GET_REVIEW_BY_ID, query = "SELECT r FROM Review r WHERE r.id = :id")
 
 
 public class Review {
     public static final String GET_ALL_REVIEWS_PROFILE = "Review.getReviewsByProfile";
-    //public static final String GET_ALL_REVIEWS_MOVIE = "Review.findAllMovieReviews";
+    public static final String GET_REVIEW_BY_ID = "Review.getReviewById";
 
     @Id
 
@@ -24,6 +25,9 @@ public class Review {
     @ManyToOne
     @JsonIgnore
     private Profile profile;
+    private String fileName;
+    private String filePath;
+    private String fileExtension;
 //    @ManyToOne
 //    private Movie movie;
 

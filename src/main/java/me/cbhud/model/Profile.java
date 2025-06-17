@@ -28,7 +28,6 @@ public class Profile {
     private String fileName;
     private String filePath;
 
-
 //    @ManyToMany
 //    private Set<Movie> watchedMovies;
 }
