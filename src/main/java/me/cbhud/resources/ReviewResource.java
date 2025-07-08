@@ -1,65 +1,67 @@
 package me.cbhud.resources;
+import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import me.cbhud.exception.ProfileException;
 import me.cbhud.exception.ReviewException;
 import me.cbhud.model.Review;
 import me.cbhud.repository.ReviewRepository;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
+import java.util.List;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Paths;
-
-import static me.cbhud.resources.FileUploadForm.UPLOAD_DIR;
-
-@Path("/review/")
+@Path("/review")
+@Authenticated
 public class ReviewResource {
     @Inject
     private ReviewRepository reviewRepository;
 
-
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Path("uploadReview")
-        public Response uploadProfileFile(@MultipartForm ReviewUploadForm form, @QueryParam("id") Integer id) {
-        if (id == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Missing 'id' query parameter.").build();
-        }
-        if (form == null || form.file == null || form.filename == null || form.filename.isBlank()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("File and filename must be provided.").build();
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("create")
+    public Response createReview(Review r) throws ReviewException {
+        if (r.getProfile() == null) {
+            throw new ReviewException("Profile must not be null");
         }
 
-        Review review;
-        try {
-            review = reviewRepository.getReviewById(id);
-        } catch (ReviewException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Profile with id " + id + " not found.").build();
+        if (r.getRating() < 1 || r.getRating() > 5) {
+            throw new ReviewException("Rating must be between 1 and 5");
+        }
+        if (r.getReviewText() == null || r.getReviewText().isEmpty() || r.getReviewText().length() > 255) {
+            throw new ReviewException("Review text cannot be empty or exceed 255 characters");
         }
 
-        try {
-            File uploadDir = new File(UPLOAD_DIR);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
+        Review review = reviewRepository.createReview(r);
 
-            java.nio.file.Path filePath = Paths.get(UPLOAD_DIR, form.filename);
-            try (OutputStream out = new FileOutputStream(filePath.toFile())) {
-                form.file.transferTo(out);
-            }
-
-            review.setFilePath(filePath.toAbsolutePath().toString());
-            review.setFileName(form.filename);
-            review.setFileExtension(form.fileExtension);
-            reviewRepository.updateReview(review);
-
-            return Response.ok("File uploaded successfully.").build();
-        } catch (IOException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to upload file.").build();
-        }
+        return Response.ok().entity(review).build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("get")
+    public Response getReviewsByUsername(@QueryParam("username") String username) {
+        List<Review> r;
+        try {
+            r = reviewRepository.getReviewByUsername(username);
+        } catch (ReviewException e) {
+            return Response.ok().entity(e.getMessage()).build();
+        }
+        return Response.ok().entity(r).build();
+    }
+
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("get/{id}")
+    public Response getReviewById(@PathParam("id") int id) throws ReviewException {
+        Review r;
+        r = reviewRepository.getReviewById(id);
+        return Response.ok().entity(r).build();
+    }
+
+
+
+
+
 
 }

@@ -5,7 +5,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import me.cbhud.exception.ProfileException;
 import me.cbhud.model.Profile;
-import me.cbhud.model.ProfileMovie;
 import me.cbhud.model.Review;
 
 import java.util.List;
@@ -55,14 +54,23 @@ public class ProfileRepository {
         if (profile == null) {
             throw new ProfileException("No profile found with id: " + id);
         }
-            List<Review> reviews = em.createNamedQuery(Review.GET_ALL_REVIEWS_PROFILE, Review.class)
-                    .setParameter("id", id).getResultList();
-            profile.setReviews(reviews);
+
         return profile;
     }
 
     @Transactional
-    public ProfileMovie createProfileMovie(ProfileMovie p){
-        return em.merge(p);
+    public boolean checkUsernameExists(String username) throws ProfileException {
+        List<Profile> profiles = em.createNamedQuery(Profile.GET_PROFILE_BY_NAME, Profile.class)
+                .setParameter("username", username).getResultList();
+        return !profiles.isEmpty();
     }
+
+    @Transactional
+    public boolean checkEmailExists(String email) throws ProfileException {
+        List<Profile> profiles = em.createNamedQuery(Profile.GET_PROFILE_BY_EMAIL, Profile.class)
+                .setParameter("email", email).getResultList();
+        return !profiles.isEmpty();
+    }
+
+
 }

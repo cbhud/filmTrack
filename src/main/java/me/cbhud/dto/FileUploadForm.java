@@ -1,4 +1,4 @@
-package me.cbhud.resources;
+package me.cbhud.dto;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;

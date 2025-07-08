@@ -3,16 +3,23 @@ package me.cbhud.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-@Entity
+import java.time.LocalDate;
+
 @Data
+@Entity
 public class ProfileMovie {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profilemovie_seq")
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "movie_seq")
+    private Long id;
 
-    @ManyToOne(cascade =  CascadeType.ALL)
-    Profile profile;
+    @ManyToOne
+    private Profile profile;
 
-    @ManyToOne(cascade =  CascadeType.ALL)
-    Movie movie;
+    @ManyToOne
+    private Movie movie;
+
+    private LocalDate watchedAt;
+    private Integer userRating;
+    private String comment;
+
 }
