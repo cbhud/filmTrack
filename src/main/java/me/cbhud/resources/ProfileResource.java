@@ -1,5 +1,6 @@
 package me.cbhud.resources;
 import io.quarkus.security.Authenticated;
+import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -22,19 +23,21 @@ import java.util.List;
 import static me.cbhud.dto.FileUploadForm.UPLOAD_DIR;
 
 @Path("/profile/")
-@Authenticated
 public class ProfileResource {
     @Inject
     private ProfileRepository profileRepository;
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("getAll")
-    @RolesAllowed("admin")
-    public Response getAllProfiles() {
-        List<Profile> p = profileRepository.getAllProfiles();
-        return Response.ok().entity(p).build();
-    }
+    @Inject
+    SecurityIdentity securityIdentity;
+
+//    @GET
+//    @Produces(MediaType.APPLICATION_JSON)
+//    @Path("getAll")
+//    @RolesAllowed("admin")
+//    public Response getAllProfiles() {
+//        List<Profile> p = profileRepository.getAllProfiles();
+//        return Response.ok().entity(p).build();
+//    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -65,54 +68,60 @@ public class ProfileResource {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("uploadAvatar")
-    public Response uploadProfileFile(@MultipartForm FileUploadForm form, @QueryParam("id") Integer id) {
-        if (id == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Missing 'id' query parameter.").build();
-        }
+    @Authenticated
+    public Response uploadProfileFile(@MultipartForm FileUploadForm form) {
+        String username = securityIdentity.getPrincipal().getName();
+
         if (form == null || form.file == null || form.filename == null || form.filename.isBlank()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("File and filename must be provided.").build();
         }
 
-
-        if (
-                !form.filename.endsWith(".png") &&
-                        !form.filename.endsWith(".jpg") &&
-                        !form.filename.endsWith(".jpeg") &&
-                        !form.filename.endsWith(".webp") &&
-                        !form.filename.endsWith(".gif")
-        ) {
+        // Check allowed extensions
+        String lowerName = form.filename.toLowerCase();
+        if (!lowerName.endsWith(".png") && !lowerName.endsWith(".jpg") &&
+                !lowerName.endsWith(".jpeg") && !lowerName.endsWith(".webp") &&
+                !lowerName.endsWith(".gif")) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Only png, jpg, jpeg, webp, and gif files are allowed.")
                     .build();
         }
 
-
+        // Get user profile
         Profile profile;
         try {
-            profile = profileRepository.getProfileById(id);
+            profile = profileRepository.getProfileByUsername(username).get(0);
         } catch (ProfileException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Profile with id " + id + " not found.").build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Profile not found for username: " + username).build();
         }
 
         try {
+            // Ensure upload directory exists
             File uploadDir = new File(UPLOAD_DIR);
             if (!uploadDir.exists()) uploadDir.mkdirs();
 
-            java.nio.file.Path filePath = Paths.get(UPLOAD_DIR, form.filename);
+            // Generate safe and unique filename
+            String extension = lowerName.substring(lowerName.lastIndexOf("."));
+            String uniqueFilename = username + "_" + System.currentTimeMillis() + extension;
+
+            // Save file
+            java.nio.file.Path filePath = Paths.get(UPLOAD_DIR, uniqueFilename);
             try (OutputStream out = new FileOutputStream(filePath.toFile())) {
                 form.file.transferTo(out);
             }
 
-            profile.setAvatarUrl(filePath.toString());
-
+            // Store just the filename in DB
+            profile.setAvatarUrl(uniqueFilename);
             profileRepository.createProfile(profile);
 
-            System.out.println("Profile with id " + id + " has been uploaded successfully.");
-            return Response.ok("File uploaded successfully.").build();
+            return Response.ok("Avatar uploaded successfully.").build();
+
         } catch (IOException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to upload file.").build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Failed to upload avatar.").build();
         }
     }
+
 
     @GET
     @Path("avatar")
@@ -129,21 +138,20 @@ public class ProfileResource {
             return Response.status(Response.Status.NOT_FOUND).entity("Profile not found").build();
         }
 
-        String filename = profile.getAvatarUrl(); // pretpostavimo da postoji getter za ime fajla u profilu
-
+        String filename = profile.getAvatarUrl();
         if (filename == null || filename.isBlank()) {
             return Response.status(Response.Status.NOT_FOUND).entity("Profile has no avatar uploaded").build();
         }
 
-        File file = new File(filename);
+        File file = Paths.get(UPLOAD_DIR, filename).toFile();
         if (!file.exists()) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Avatar image file not found").build();
+            return Response.status(Response.Status.NOT_FOUND).entity("Avatar image not found").build();
         }
 
         String mimeType = guessMimeType(filename);
-
         return Response.ok(file, mimeType).build();
     }
+
 
     private String guessMimeType(String filename) {
         if (filename.endsWith(".png")) {

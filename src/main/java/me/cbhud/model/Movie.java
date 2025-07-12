@@ -1,5 +1,6 @@
 package me.cbhud.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import jakarta.persistence.*;
 import java.util.List;
@@ -9,9 +10,11 @@ import java.util.List;
 
 @NamedQuery(name = Movie.GET_MOVIE_BY_TITLE, query = "SELECT m FROM Movie m WHERE m.title = :title")
 @NamedQuery(name = Movie.GET_MOVIE_BY_ID, query = "SELECT m FROM Movie m WHERE m.id = :id")
+@NamedQuery(name = Movie.GET_MOVIE_BY_IMDB_ID, query = "SELECT m FROM Movie m WHERE m.imdbId = :imdbId")
 public class Movie {
     public static final String GET_MOVIE_BY_TITLE = "Movie.getMovieByTitle";
     public static final String GET_MOVIE_BY_ID = "Movie.getMovieById";
+    public static final String GET_MOVIE_BY_IMDB_ID = "Movie.getMovieByImdbId";
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "movie_seq")
     private Integer id;
@@ -32,6 +35,7 @@ public class Movie {
     @JoinColumn(name = "movie_id")
     private List<Review> reviews;
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<ProfileMovie> viewers;
 
 
